@@ -261,6 +261,10 @@ section {
   gap: 1rem;
 }
 
+.profile-pic {
+  border-radius: 12rem;
+}
+
 /* ABOUT */
 
 #about {
