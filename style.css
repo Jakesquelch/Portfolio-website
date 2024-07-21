@@ -262,7 +262,8 @@ section {
 }
 
 .profile-pic {
-  border-radius: 12rem;
+  /* Set your desired height, same as width */
+  border-radius: 50%;
 }
 
 /* ABOUT */
