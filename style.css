@@ -292,6 +292,12 @@ section {
   border-radius: 5rem;
 }
 
+.text-container {
+  padding: 1.5rem;
+  border: 2px solid #ccc;
+  border-radius: 1rem;
+}
+
 .arrow {
   position: absolute;
   right: -5rem;
@@ -299,13 +305,41 @@ section {
 }
 
 .details-container {
-  padding: 1.5rem;
+  padding: 3rem;
   flex: 1;
   background: white;
   border-radius: 2rem;
   border: rgb(53, 53, 53) 0.1rem solid;
   border-color: rgb(163, 163, 163);
   text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; /* Smooth transition for hover effects */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  color: #333; /* Default text color */
+}
+
+.details-container img {
+  transition: filter 0.3s ease; /* Smooth transition for icon color */
+}
+
+.details-container:hover {
+  transform: translateY(-10px); /* Slight lift effect on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+  background: rgb(53, 53, 53); /* Background turns black on hover */
+  color: #fff; /* Text turns white on hover */
+}
+
+.details-container:hover h3,
+.details-container:hover p {
+  color: #fff; /* Ensure all text (h3 and p) turns white on hover */
+}
+
+.details-container:hover img {
+  filter: brightness(0) invert(1); /* Icon turns white on hover */
+}
+
+.details-container p {
+  margin-top: 0.5rem; /* Adds space above the p element */
+  line-height: 1.6; /* Increases the space between lines of text within the p element */
 }
 
 .section-container {
@@ -370,9 +404,8 @@ article .icon {
 }
 
 .project-img {
-  border-radius: 2rem;
-  width: 90%;
-  height: 90%;
+  width: 50%;
+  height: 50%;
 }
 
 .project-title {
@@ -420,6 +453,19 @@ article .icon {
 .contact-icon-linkedin {
   cursor: default;
   height: 2rem;
+}
+
+.project-container {
+  padding: 3rem;
+  flex: 1;
+  background: white;
+  border-radius: 2rem;
+  border: rgb(53, 53, 53) 0.1rem solid;
+  border-color: rgb(163, 163, 163);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; /* Smooth transition for hover effects */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  color: #333; /* Default text color */
 }
 
 /* FOOTER */
