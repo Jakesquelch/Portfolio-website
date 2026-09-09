@@ -3,8 +3,8 @@
 ![The site in dark mode — hero and about section](docs/screenshot.png)
 
 My personal portfolio site. The goal is to give a bit more background on me than
-a CV does — who I am, where I've worked, and what I've been building — in a
-format I can update in one file and push.
+a CV does — who I am, where I've worked, and what I've been building — plus a
+blog, in a format I can update and push.
 
 It's deliberately quiet. No animation library, no hero video, no scroll-jacking.
 Neutral ground, one violet accent, and a recurring monospace-label motif. The
@@ -59,15 +59,17 @@ npm run dev
 npm run build       # production build
 npm run start       # serve the build (needs build first)
 npm run lint        # eslint
+npm run format      # prettier, incl. re-wrapping post prose to 80 columns
 ```
 
 ---
 
 ## Editing the content
 
-All the copy and data lives in one file: [`lib/data.ts`](lib/data.ts). Section
-headings are hardcoded in the JSX — everything that actually changes lives in
-the data file.
+The homepage copy and data all live in one file:
+[`lib/data.ts`](lib/data.ts). Section headings are hardcoded in the JSX —
+everything that actually changes lives in the data file. (Blog posts are the
+exception: they're MDX files, see [below](#writing-a-post).)
 
 - `socials` — LinkedIn / GitHub / email, shared by the nav, hero and footer
 - `aboutParagraphs` — the bio, rendered in order
@@ -77,6 +79,36 @@ the data file.
 - `projects[]` — each renders as a horizontal card. Set `image` or `github` to
   `null` for the placeholder / "coming soon" fallbacks; set `imageBg` to the
   screenshot's own background colour so its letterboxing blends in
+
+### Writing a post
+
+Posts are `.mdx` files in [`content/posts/`](content/posts). **The filename is
+the URL** — `content/posts/homelabbing.mdx` is served at `/blog/homelabbing` —
+and dropping a file in that directory is the entire publishing step. There's no
+index to keep in sync.
+
+Each post opens with a `meta` block, which drives the listing card, the `<h1>`,
+the page title and the social preview image:
+
+```tsx
+export const meta = {
+  title: "Homelabbing 101",
+  date: "2026-09-07", // ISO; the listing sorts newest-first on this string
+  summary: "One line that shows up on the listing card.",
+  tags: ["Homelab"],
+};
+```
+
+Everything below it is markdown, styled by
+[`mdx-components.tsx`](mdx-components.tsx) at the project root — that file maps
+each HTML tag onto the site's type scale, so posts need no wrapper class and no
+prose plugin. Because it's MDX rather than plain markdown, a post can also
+`import` a React component and drop it inline; `homelabbing.mdx` does this for
+the network diagram in [`components/diagrams/`](components/diagrams).
+
+Prose in posts is hard-wrapped at 80 columns. Don't do that by hand — Prettier
+is configured with `proseWrap: "always"`, so `npm run format` (or format-on-save
+in the editor) re-flows a paragraph after you edit it.
 
 ---
 
@@ -96,9 +128,12 @@ skill group labels, project tag chips. Everything else is Geist Sans. The only
 motion anywhere is ~200ms colour and opacity transitions on hover, the theme
 cross-fade, and smooth scrolling.
 
-### What's on the page
+### What's on the site
 
-`app/page.tsx` composes a single column:
+Three routes: the homepage (`/`), the blog index (`/blog`) and a page per post
+(`/blog/<slug>`).
+
+`app/page.tsx` composes the homepage as a single column:
 
 1. **Hero** — name and role on the left, circular photo on the right (stacks
    photo-first on mobile). Social buttons plus a Contact button that copies the
@@ -109,12 +144,22 @@ cross-fade, and smooth scrolling.
 4. **Projects** — wide horizontal cards, image left (~38%), content right,
    stacking on mobile
 
+The blog is two further pages, both driven entirely by the files in
+`content/posts/`:
+
+5. **Blog index** (`app/blog/page.tsx`) — one card per post, newest first, each
+   showing date, tags, title and summary
+6. **Post** (`app/blog/[slug]/page.tsx`) — a back-link, the title/date/tags
+   header, then the compiled MDX body
+
 And from `app/layout.tsx`, on every screen:
 
 - **Nav** — sticky bar. The name on the left only fades in once you've scrolled
-  past the hero, so the page never reads "Jake Squelch" twice at once. An
-  IntersectionObserver drives the active-link highlight. No hamburger — the
-  three links fit on mobile once the name hides below `sm`
+  past the hero, so the page never reads "Jake Squelch" twice at once. On the
+  homepage an IntersectionObserver drives the active-link highlight; away from
+  it the three section links become `/#…` links back to the homepage and Blog
+  highlights on the pathname instead. No hamburger — the four links fit on
+  mobile once the name hides below `sm`
 - **ThemeToggle** — bordered circle in the nav, sun ↔ moon
 - **BackToTop** — fades in past ~60% of the viewport height, aligned to the
   content column's right edge rather than the viewport's
@@ -126,8 +171,8 @@ And from `app/layout.tsx`, on every screen:
 
 The site should be close to free to load, and mostly is:
 
-- About, Experience, Projects and Footer are **server components** — they ship
-  no JavaScript at all
+- About, Experience, Projects, Footer and both blog pages are **server
+  components** — they ship no JavaScript at all
 - Client JS is limited to four things: the nav (observer + smooth scroll), the
   theme toggle, the hero contact button, and back-to-top
 - Scroll listeners are all `{ passive: true }`
@@ -145,6 +190,8 @@ The site should be close to free to load, and mostly is:
 - **Language:** TypeScript 5
 - **Styling:** Tailwind CSS v4 with a CSS-variable token set (7 per theme)
 - **Theming:** next-themes, dark by default
+- **Blog:** MDX via `@next/mdx`, posts as files in `content/posts/`
+- **Formatting:** Prettier (`proseWrap: "always"` — posts wrap at 80 columns)
 - **Fonts:** Geist Sans + Geist Mono via `next/font`
 - **Hosting:** Vercel
 - **AI Model:** Claude Code Pro

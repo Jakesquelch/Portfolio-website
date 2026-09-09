@@ -1,8 +1,16 @@
 # Portfolio Website — Design notes
 
-This is the living design doc for the site. It captures *what shipped* and
-*why* — not aspirations. For the practical "how do I run / edit this" guide
-see [`README.md`](README.md).
+> **Historical — superseded by the redesign.** This documents the original
+> space/glassmorphic build, and most of it no longer describes the site: the
+> starfield, glass utilities, Motion animations, oklch Cosmic/Daybreak
+> palettes, Space Grotesk, the duration rings, the card tilt, the mobile
+> hamburger and the `prefers-reduced-motion` block have all been removed. It
+> also predates the blog entirely. Kept for the reasoning — particularly
+> "what shipped vs. what didn't" — not as a description of the code.
+>
+> For how the site works now, see
+> [`architecture.md`](architecture.md); for running and editing it, see
+> [`../README.md`](../README.md).
 
 ## Why I'm building this
 
