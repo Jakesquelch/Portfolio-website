@@ -1,0 +1,132 @@
+export const meta = {
+  title: "Homelabbing 101",
+  date: "2026-09-09",
+  summary:
+    "Setting things up and learning more about this new interest of mine!",
+  tags: ["Homelab"],
+};
+
+import { TailnetDiagram } from "@/components/diagrams/tailnet";
+
+Recently I've come across the term 'homelabbing' and have become fascinated with
+it. This blog will outline what I have done so far, what I have learnt, and what
+I plan to do in the future. I'm literally just getting started with this and am
+just messing around and having some fun, please if people have any advice then
+I'd love to hear it!
+
+## Introduction
+
+So what is a homelab/homelabbing? Homelabs can be used for lots of things,
+specifically for me I'm interested in the idea of self-hosting. A homelab will
+allow me to utilise a private, self-contained computer to run my own server.
+Over the years I have subscribed to third-party cloud providers and services
+such as Google Photos and it's got to a point where these have built up and are
+now costing a bit more money than I would like, each month. More importantly, I
+like the idea of owning my data myself, that is the real motivator that
+triggered my excitement to learn about homelabbing.
+
+## So what is my goal?
+
+For now the goal is to create my own server where I can store my data and not
+rely on these third-party companies to do so for me. Specifically, I am starting
+with Google Photos which costs me a whopping £1.79 a month! I'm going to attempt
+to replace Google Photos with [Immich](https://immich.app/) (a self-hosted,
+open-source photo and video management solution) and thereby hopefully being
+able to cancel the payments that I make for the service of Google Photos. This
+is my current goal but I'm very flexible with this, it is more about learning
+how this all works and whether this is a solution I think would actually work
+for me.
+
+## Getting started
+
+There is masses of information out there regarding homelabs and it can be a bit
+overwhelming when you start. I decided instead of going down the tutorial-hell
+route and stuck in a procrastination cycle, I would just get started with an old
+laptop that I didn't really use anymore, as that is all you need to get started.
+
+### Setting up my laptop
+
+I installed [Ubuntu Server](https://ubuntu.com/server) onto the laptop, I
+decided to use this instead of Ubuntu Desktop because the specs for my laptop
+aren't the best (11GB RAM & Celeron N5095 4c/4t) and I wanted less RAM and CPU
+used as well as less software installed.
+
+### Step 1 - Hardening
+
+First thing I wanted to do was harden up my server and make sure it was secure.
+This involves removing potential ways in. Bots continuously scan the internet
+and anything with SSH open immediately gets `root`/`admin`/`ubuntu` tried
+against the most common passwords, so this is what we need to defend against.
+
+So these are some things I did to help harden my server:
+
+- Password auth off, SSH keys only
+- Root login disabled
+
+Next I installed [`ufw`](https://help.ubuntu.com/community/UFW) which stands for
+"Uncomplicated Firewall". It technically isn't actually a firewall it's more of
+a wrapper but that's beside the point. This is a host firewall which means it
+runs on and filters my laptops traffic only. It writes rules into my laptops
+kernel and cannot reach the router. I picked `ufw` because it's Ubuntu's default
+and handles IPv4 and IPv6 together without being asked. A firewall is important
+to have because it blocks unwanted incoming traffic and stops potentially
+compromised devices from reaching other services on your server (I have
+default-deny inbound).
+
+### Step 2 - Installing Infrastructure
+
+I then decided to install [Docker](https://www.docker.com/) to solve dependency
+hell problems that could and would likely occur in the future. For example
+instead of installing Python packages system-wide as that is a dependency for
+Immich, and then in the future a new service wanting a different version, and
+the two colliding over one system-wide library. We can use Docker so that every
+service has its own private complete filesystem with exactly the versions it
+wants (this is containerisation). I also installed
+[`docker compose`](https://docs.docker.com/compose/) because Immich is four
+containers and I want to make it easy to bring them all up together.
+
+[Tailscale](https://tailscale.com/) was up next, this is something I had heard
+of before but had no clue what it did. Put simply it solves the home LAN
+problem. My server is reachable from the home LAN and nowhere else, and I needed
+a way to use Immich from my phone via mobile data or on another laptop when I'm
+out and about. To achieve this, a connection has to reach my server which is
+sitting behind a NAT on my home router. Tailscale solves that problem. Port
+forwarding is an alternative option but I didn't fancy forwarding port `2283` to
+the internet. Under the hood of Tailscale is
+[WireGuard](https://www.wireguard.com/), but it also adds coordination on top of
+it, which made things a lot easier for me. Tailscale creates a private network
+of your devices (a tailnet), and then the devices make outbound connections to a
+coordination server, and that is how my devices can now communicate to each
+other.
+
+<TailnetDiagram />
+
+### Step 3 - Installing Immich
+
+Now I had my infrastructure in place it was time to actually install Immich and
+transfer my photos over. Firstly, I used
+[Google Takeout](https://takeout.google.com/) to export all my photos from
+Google Photos. Next I installed Immich and
+[`immich-go`](https://github.com/simulot/immich-go) to run the import of all my
+photos. And just like that it was all done! I had successfully transferred all
+of my google photos over to Immich. I had set up Tailscale and Immich
+successfully on my phone so that I could view my photos there as well. Now this
+is all well and good and you may be thinking we are done there...we are not.
+
+## Final thoughts
+
+Before I am able to delete my Google Photos subscription, I need to make sure
+that my data is safe and secure. So those are the next steps. At the moment we
+do not have backups of our photos, all our immich data sits on one SSD on my
+laptop, if that drive dies, I would lose everything. A common rule to follow is
+the [3-2-1 rule](https://en.wikipedia.org/wiki/Backup#3-2-1_Backup_Rule):
+
+- 3 copies (this can help against just general bad luck such as a drive failing)
+- 2 media types (to help prevent against correlated failures)
+- 1 offsite (against fires, floods etc)
+
+So I have a bit more work to be done before I can start fully being reliant on
+my homelab! I am left at a bit of a crossroads now and find myself a little
+unsure on where to go from here, but I'm sure I'll figure it out. If anyone has
+any advice or tips please reach out to me, I'm by no means trying to claim to be
+an expert in this stuff. Thanks for reading!
